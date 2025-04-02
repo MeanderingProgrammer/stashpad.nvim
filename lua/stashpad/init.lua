@@ -2,10 +2,14 @@
 local M = {}
 
 ---@class (exact) stashpad.user.Config
+---@field root? string
 
 ---@private
 ---@type stashpad.Config
-M.default = {}
+M.default = {
+    -- Typically resolves to ~/.local/share/nvim/stashpad
+    root = vim.fs.joinpath(vim.fn.stdpath('data'), 'stashpad'),
+}
 
 ---@param opts? stashpad.user.Config
 function M.setup(opts)
