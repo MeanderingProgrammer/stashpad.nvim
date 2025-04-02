@@ -3,4 +3,5 @@ if vim.g.loaded_stashpad then
 end
 vim.g.loaded_stashpad = true
 
+require('stashpad').setup()
 require('stashpad.command').setup()

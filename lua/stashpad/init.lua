@@ -7,6 +7,9 @@ local M = {}
 ---@field win stashpad.config.Win
 
 ---@private
+M.initialized = false
+
+---@private
 ---@type stashpad.Config
 M.default = {
     file = {
@@ -30,6 +33,12 @@ M.default = {
 
 ---@param opts? stashpad.user.Config
 function M.setup(opts)
+    -- Skip initialization if already done and input is empty
+    if M.initialized and vim.tbl_count(opts or {}) == 0 then
+        return
+    end
+    M.initialized = true
+
     local config = vim.tbl_deep_extend('force', M.default, opts or {})
     require('stashpad.file').setup(config.file)
     require('stashpad.git').setup(config.git)
