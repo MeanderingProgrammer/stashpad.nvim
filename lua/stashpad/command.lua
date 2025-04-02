@@ -31,7 +31,7 @@ end
 function M.command(opts)
     local args, message = opts.fargs, nil
     if #args == 0 or #args == 1 then
-        local command = #args == 0 and api.open or api[args[1]]
+        local command = #args == 0 and api.branch or api[args[1]]
         if command ~= nil then
             command()
         else

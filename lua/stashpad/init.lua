@@ -1,33 +1,27 @@
 ---@class stashpad.Init: stashpad.Api
 local M = {}
 
----@class (exact) stashpad.user.Config
----@field root? string
----@field fallback? string
----@field buffer? stashpad.user.Buffer
----@field window? stashpad.user.Window
-
----@class (exact) stashpad.user.Buffer
----@field filetype? fun(): string
-
----@class (exact) stashpad.user.Window
----@field width? number
----@field height? number
----@field border? string|string[]
+---@class (exact) stashpad.Config
+---@field file stashpad.config.File
+---@field git stashpad.config.Git
+---@field win stashpad.config.Win
 
 ---@private
 ---@type stashpad.Config
 M.default = {
-    -- Typically resolves to ~/.local/share/nvim/stashpad
-    root = vim.fs.joinpath(vim.fn.stdpath('data'), 'stashpad'),
-    -- Fallback for repo and branch if they cannot be determined
-    fallback = 'default',
-    buffer = {
-        filetype = function()
-            return 'markdown'
+    file = {
+        -- Typically resolves to ~/.local/share/nvim/stashpad
+        root = vim.fs.joinpath(vim.fn.stdpath('data'), 'stashpad'),
+        -- Extension to use for files
+        extension = function()
+            return 'md'
         end,
     },
-    window = {
+    git = {
+        -- Fallback for any information that cannot be determined
+        fallback = 'default',
+    },
+    win = {
         width = 0.75,
         height = 0.75,
         border = vim.o.winborder,
@@ -36,7 +30,10 @@ M.default = {
 
 ---@param opts? stashpad.user.Config
 function M.setup(opts)
-    require('stashpad.state').setup(M.default, opts or {})
+    local config = vim.tbl_deep_extend('force', M.default, opts or {})
+    require('stashpad.file').setup(config.file)
+    require('stashpad.git').setup(config.git)
+    require('stashpad.win').setup(config.win)
 end
 
 return setmetatable(M, {

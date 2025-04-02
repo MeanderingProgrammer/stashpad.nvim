@@ -1,15 +1,18 @@
 ---@meta
 
----@class (exact) stashpad.Config
----@field root string
----@field fallback string
----@field buffer stashpad.Buffer
----@field window stashpad.Window
+---@class (exact) stashpad.user.Config
+---@field file? stashpad.config.user.File
+---@field git? stashpad.config.user.Git
+---@field win? stashpad.config.user.Win
 
----@class (exact) stashpad.Buffer
----@field filetype fun(): string
+---@class (exact) stashpad.config.user.File
+---@field root? string
+---@field extension? fun(): string
 
----@class (exact) stashpad.Window
----@field width number
----@field height number
----@field border string|string[]
+---@class (exact) stashpad.config.user.Git
+---@field fallback? string
+
+---@class (exact) stashpad.config.user.Win
+---@field width? number
+---@field height? number
+---@field border? string|string[]

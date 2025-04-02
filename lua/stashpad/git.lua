@@ -1,10 +1,20 @@
+---@class (exact) stashpad.config.Git
+---@field fallback string
+
 ---@class stashpad.Git
+---@field private config stashpad.config.Git
 local M = {}
 
----@return string?
+---Should only be called from init.lua setup
+---@param config stashpad.config.Git
+function M.setup(config)
+    M.config = config
+end
+
+---@return string
 function M.repo()
     local origin = M.run({ 'git', 'remote', 'get-url', 'origin' })
-    return origin ~= nil and M.parse_name(origin) or nil
+    return origin ~= nil and M.parse_name(origin) or M.config.fallback
 end
 
 ---@param origin string
@@ -15,9 +25,9 @@ function M.parse_name(origin)
     return name
 end
 
----@return string?
+---@return string
 function M.branch()
-    return M.run({ 'git', 'branch', '--show-current' })
+    return M.run({ 'git', 'branch', '--show-current' }) or M.config.fallback
 end
 
 ---@private
