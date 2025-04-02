@@ -15,13 +15,31 @@ function M.open()
         assert(io.open(file, 'w')):close()
     end
 
+    local buf = vim.fn.bufadd(file)
+
+    local rows = vim.o.lines
+    local cols = vim.o.columns
+
+    local height = math.floor(rows * 0.8)
+    local width = math.floor(cols * 0.8)
+
+    local win = vim.api.nvim_open_win(buf, true, {
+        border = 'rounded',
+        relative = 'editor',
+        height = height,
+        width = width,
+        row = math.floor((rows - height) / 2),
+        col = math.floor((cols - width) / 2),
+    })
+
     vim.print({
+        buf = buf,
+        win = win,
         repo = repo,
         branch = branch,
         directory = directory,
         file = file,
     })
-    -- vim.fn.bufadd()
 end
 
 return M
