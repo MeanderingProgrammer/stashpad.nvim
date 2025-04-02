@@ -5,9 +5,13 @@ local state = require('stashpad.state')
 local M = {}
 
 function M.open()
-    local repo = git.repo() or 'default'
-    local branch = git.branch() or 'default'
-    local directory = vim.fs.joinpath(state.config.root, repo)
+    local config = state.config
+    local buffer = config.buffer
+    local window = config.window
+
+    local repo = git.repo() or config.fallback
+    local branch = git.branch() or config.fallback
+    local directory = vim.fs.joinpath(config.root, repo)
     local file = vim.fs.joinpath(directory, branch)
 
     vim.fn.mkdir(directory, 'p')
@@ -16,30 +20,23 @@ function M.open()
     end
 
     local buf = vim.fn.bufadd(file)
+    vim.api.nvim_set_option_value('filetype', buffer.filetype(), { buf = buf })
 
-    local rows = vim.o.lines
     local cols = vim.o.columns
-
-    local height = math.floor(rows * 0.8)
-    local width = math.floor(cols * 0.8)
-
+    local rows = vim.o.lines
+    local width = math.floor((cols * window.width) + 0.5)
+    local height = math.floor((rows * window.height) + 0.5)
     local win = vim.api.nvim_open_win(buf, true, {
-        border = 'rounded',
-        relative = 'editor',
-        height = height,
-        width = width,
-        row = math.floor((rows - height) / 2),
         col = math.floor((cols - width) / 2),
+        row = math.floor((rows - height) / 2),
+        width = width,
+        height = height,
+        relative = 'editor',
+        border = window.border,
+        title = string.format(' %s : %s ', repo, branch),
+        title_pos = 'center',
     })
-
-    vim.print({
-        buf = buf,
-        win = win,
-        repo = repo,
-        branch = branch,
-        directory = directory,
-        file = file,
-    })
+    vim.api.nvim_set_option_value('winfixbuf', true, { win = win })
 end
 
 return M
