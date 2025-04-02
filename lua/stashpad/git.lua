@@ -10,9 +10,6 @@ end
 ---@param origin string
 ---@return string
 function M.parse_name(origin)
-    -- git@forge.com:user/repo.git     -> repo
-    -- https://forge.com/user/repo     -> repo
-    -- https://forge.com/user/repo.git -> repo
     local details = vim.split(origin, '/', { plain = true })
     local name = details[#details]:gsub('%.git$', '')
     return name
