@@ -9,7 +9,7 @@
 ---@field file string
 
 ---@class stashpad.win.Opts
----@field file string
+---@field info stashpad.file.Info
 ---@field title string
 
 ---@class stashpad.Win
@@ -28,7 +28,7 @@ end
 function M.toggle(opts)
     if M.state == nil then
         M.open(opts)
-    elseif M.state.file == opts.file then
+    elseif M.state.file == opts.info.file then
         M.close()
     else
         M.close()
@@ -41,9 +41,11 @@ end
 function M.open(opts)
     assert(M.state == nil, 'stashpad already open')
 
-    local buf = vim.fn.bufadd(opts.file)
-    vim.keymap.set('n', 'q', M.close, { buffer = buf, noremap = true, silent = true })
-    vim.keymap.set('n', '<esc>', M.close, { buffer = buf, noremap = true, silent = true })
+    local info = opts.info
+
+    local buf = vim.fn.bufadd(info.file)
+    M.keymap(buf, 'q', M.close)
+    M.keymap(buf, '<esc>', M.close)
 
     local cols = vim.o.columns
     local rows = vim.o.lines
@@ -56,19 +58,26 @@ function M.open(opts)
         height = height,
         relative = 'editor',
         border = M.config.border,
-        title = string.format(' %s ', opts.title),
+        title = string.format(' Project : %s | %s ', info.project, opts.title),
         title_pos = 'center',
     })
     vim.api.nvim_set_option_value('winfixbuf', true, { win = win })
 
     vim.api.nvim_create_autocmd('BufLeave', {
         buffer = buf,
-        callback = function()
-            M.close()
-        end,
+        callback = function() M.close() end,
     })
 
-    M.state = { buf = buf, win = win, file = opts.file }
+    M.state = { buf = buf, win = win, file = info.file }
+end
+
+---@private
+---@param buf integer
+---@param lhs string
+---@param rhs function
+function M.keymap(buf, lhs, rhs)
+    local opts = { buffer = buf, noremap = true, silent = true }
+    vim.keymap.set('n', lhs, rhs, opts)
 end
 
 ---@private
@@ -76,9 +85,10 @@ function M.close()
     if M.state == nil then
         return
     end
-    vim.api.nvim_buf_call(M.state.buf, function()
-        vim.cmd.write({ mods = { silent = true } })
-    end)
+    vim.api.nvim_buf_call(
+        M.state.buf,
+        function() vim.cmd.write({ mods = { silent = true } }) end
+    )
     vim.api.nvim_win_close(M.state.win, true)
     M.state = nil
 end

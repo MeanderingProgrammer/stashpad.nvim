@@ -1,4 +1,4 @@
-local api = require('stashpad.api')
+local Api = require('stashpad.api')
 
 ---@class stashpad.Command
 local M = {}
@@ -18,7 +18,7 @@ function M.setup()
             if cmdline:find(M.name .. '%s+%S+%s+.*') then
                 return {}
             elseif cmdline:find(M.name .. '%s+') then
-                return M.matches(prefix, vim.tbl_keys(api))
+                return M.matches(prefix, vim.tbl_keys(Api))
             else
                 return {}
             end
@@ -29,19 +29,19 @@ end
 ---@private
 ---@param opts { fargs: string[] }
 function M.command(opts)
-    local args, message = opts.fargs, nil
+    local args, err = opts.fargs, nil
     if #args == 0 or #args == 1 then
-        local command = #args == 0 and api.branch or api[args[1]]
+        local command = #args == 0 and Api.branch or Api[args[1]]
         if command ~= nil then
             command()
         else
-            message = string.format('unexpected command: %s', args[1])
+            err = string.format('unexpected command: %s', args[1])
         end
     else
-        message = string.format('unexpected # arguments: %d', #args)
+        err = string.format('unexpected # arguments: %d', #args)
     end
-    if message ~= nil then
-        vim.notify(string.format('%s: %s', M.plugin, message), vim.log.levels.ERROR)
+    if err ~= nil then
+        vim.notify(string.format('%s: %s', M.plugin, err), vim.log.levels.ERROR)
     end
 end
 

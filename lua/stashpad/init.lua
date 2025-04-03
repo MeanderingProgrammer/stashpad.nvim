@@ -4,6 +4,7 @@ local M = {}
 ---@class (exact) stashpad.Config
 ---@field file stashpad.config.File
 ---@field git stashpad.config.Git
+---@field project stashpad.config.Project
 ---@field win stashpad.config.Win
 
 ---@private
@@ -16,13 +17,16 @@ M.default = {
         -- Typically resolves to ~/.local/share/nvim/stashpad
         root = vim.fs.joinpath(vim.fn.stdpath('data'), 'stashpad'),
         -- Extension to use for files
-        extension = function()
-            return 'md'
-        end,
+        extension = function() return 'md' end,
     },
     git = {
-        -- Fallback for any information that cannot be determined
-        fallback = 'default',
+        -- Fallback for branch if it cannot be determined
+        branch = function() return 'default' end,
+    },
+    project = {
+        order = { 'remote', 'root', 'lsp' },
+        markers = { '.git' },
+        fallback = function() return 'default' end,
     },
     win = {
         width = 0.75,
@@ -42,6 +46,7 @@ function M.setup(opts)
     local config = vim.tbl_deep_extend('force', M.default, opts or {})
     require('stashpad.file').setup(config.file)
     require('stashpad.git').setup(config.git)
+    require('stashpad.project').setup(config.project)
     require('stashpad.win').setup(config.win)
 end
 
