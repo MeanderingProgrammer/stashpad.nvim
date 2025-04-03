@@ -65,7 +65,9 @@ function M.open(opts)
 
     vim.api.nvim_create_autocmd('BufLeave', {
         buffer = buf,
-        callback = function() M.close() end,
+        callback = function()
+            M.close()
+        end,
     })
 
     M.state = { buf = buf, win = win, file = info.file }
@@ -85,10 +87,9 @@ function M.close()
     if M.state == nil then
         return
     end
-    vim.api.nvim_buf_call(
-        M.state.buf,
-        function() vim.cmd.write({ mods = { silent = true } }) end
-    )
+    vim.api.nvim_buf_call(M.state.buf, function()
+        vim.cmd.write({ mods = { silent = true } })
+    end)
     vim.api.nvim_win_close(M.state.win, true)
     M.state = nil
 end

@@ -14,7 +14,13 @@ local M = {}
 
 ---Should only be called from init.lua setup
 ---@param config stashpad.config.File
-function M.setup(config) M.config = config end
+function M.setup(config)
+    M.config = config
+end
+
+function M.delete()
+    vim.fs.rm(M.config.root, { recursive = true, force = true })
+end
 
 ---@param name string
 ---@return stashpad.file.Info

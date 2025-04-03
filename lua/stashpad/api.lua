@@ -5,6 +5,29 @@ local Win = require('stashpad.win')
 ---@class stashpad.Api
 local M = {}
 
+function M.delete()
+    local ack = 'confirm and delete'
+    local prompt = {
+        'This will permanently delete all your notes',
+        'Type the following phrase exactly to proceed',
+        ack,
+        '',
+    }
+    vim.ui.input({ prompt = table.concat(prompt, '\n') }, function(input)
+        local levels = vim.log.levels
+        if input ~= ack then
+            vim.notify('skip', levels.INFO)
+        else
+            local ok, err = pcall(File.delete)
+            if ok then
+                vim.notify('success', levels.INFO)
+            else
+                vim.notify(string.format('fail: %s', err), levels.ERROR)
+            end
+        end
+    end)
+end
+
 function M.branch()
     local branch = Git.branch()
     Win.toggle({

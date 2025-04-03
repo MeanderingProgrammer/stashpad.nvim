@@ -13,7 +13,9 @@ local M = {}
 
 ---Should only be called from init.lua setup
 ---@param config stashpad.config.Project
-function M.setup(config) M.config = config end
+function M.setup(config)
+    M.config = config
+end
 
 ---@return string
 function M.get()

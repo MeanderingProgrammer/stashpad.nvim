@@ -17,16 +17,22 @@ M.default = {
         -- Typically resolves to ~/.local/share/nvim/stashpad
         root = vim.fs.joinpath(vim.fn.stdpath('data'), 'stashpad'),
         -- Extension to use for files
-        extension = function() return 'md' end,
+        extension = function()
+            return 'md'
+        end,
     },
     git = {
         -- Fallback for branch if it cannot be determined
-        branch = function() return 'default' end,
+        branch = function()
+            return 'default'
+        end,
     },
     project = {
         order = { 'remote', 'root', 'lsp' },
         markers = { '.git' },
-        fallback = function() return 'default' end,
+        fallback = function()
+            return 'default'
+        end,
     },
     win = {
         width = 0.75,
