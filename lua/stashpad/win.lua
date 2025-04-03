@@ -6,6 +6,7 @@
 ---@class stashpad.win.State
 ---@field buf integer
 ---@field win integer
+---@field file string
 
 ---@class stashpad.win.Opts
 ---@field file string
@@ -27,8 +28,11 @@ end
 function M.toggle(opts)
     if M.state == nil then
         M.open(opts)
+    elseif M.state.file == opts.file then
+        M.close()
     else
         M.close()
+        M.open(opts)
     end
 end
 
@@ -38,6 +42,8 @@ function M.open(opts)
     assert(M.state == nil, 'stashpad already open')
 
     local buf = vim.fn.bufadd(opts.file)
+    vim.keymap.set('n', 'q', M.close, { buffer = buf, noremap = true, silent = true })
+    vim.keymap.set('n', '<esc>', M.close, { buffer = buf, noremap = true, silent = true })
 
     local cols = vim.o.columns
     local rows = vim.o.lines
@@ -50,20 +56,30 @@ function M.open(opts)
         height = height,
         relative = 'editor',
         border = M.config.border,
-        title = opts.title,
+        title = string.format(' %s ', opts.title),
         title_pos = 'center',
     })
     vim.api.nvim_set_option_value('winfixbuf', true, { win = win })
 
-    M.state = { buf = buf, win = win }
+    vim.api.nvim_create_autocmd('BufLeave', {
+        buffer = buf,
+        callback = function()
+            M.close()
+        end,
+    })
+
+    M.state = { buf = buf, win = win, file = opts.file }
 end
 
 ---@private
 function M.close()
-    assert(M.state ~= nil, 'stashpad not open')
-
+    if M.state == nil then
+        return
+    end
+    vim.api.nvim_buf_call(M.state.buf, function()
+        vim.cmd.write({ mods = { silent = true } })
+    end)
     vim.api.nvim_win_close(M.state.win, true)
-
     M.state = nil
 end
 

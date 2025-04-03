@@ -14,12 +14,15 @@ function M.setup(config)
     M.config = config
 end
 
+---@param prefix string[]
 ---@param name string
 ---@return string
-function M.get(name)
-    local repo = git.repo()
-    local dir = vim.fs.joinpath(M.config.root, repo)
-    vim.fn.mkdir(dir, 'p')
+function M.get(prefix, name)
+    local path = vim.list_extend({ M.config.root, git.repo() }, prefix)
+    local dir = vim.fs.joinpath(unpack(path))
+    if vim.uv.fs_stat(dir) == nil then
+        vim.fn.mkdir(dir, 'p')
+    end
 
     local extension = M.config.extension()
     local file = string.format('%s.%s', vim.fs.joinpath(dir, name), extension)

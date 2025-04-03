@@ -8,8 +8,22 @@ local M = {}
 function M.branch()
     local branch = git.branch()
     win.toggle({
-        file = file.get(branch),
-        title = string.format(' Branch : %s ', branch),
+        file = file.get({ 'branch' }, branch),
+        title = string.format('Branch : %s', branch),
+    })
+end
+
+function M.global()
+    win.toggle({
+        file = file.get({}, 'global'),
+        title = 'Global',
+    })
+end
+
+function M.todo()
+    win.toggle({
+        file = file.get({}, 'todo'),
+        title = 'Todo',
     })
 end
 
