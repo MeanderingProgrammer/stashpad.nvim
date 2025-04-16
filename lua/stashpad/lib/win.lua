@@ -1,4 +1,4 @@
----@class (exact) stashpad.config.Win
+---@class (exact) stashpad.win.Config
 ---@field width number
 ---@field height number
 ---@field border string|string[]
@@ -13,12 +13,12 @@
 ---@field title string
 
 ---@class stashpad.Win
----@field private config stashpad.config.Win
+---@field private config stashpad.win.Config
 ---@field private state? stashpad.win.State
 local M = {}
 
 ---Should only be called from init.lua setup
----@param config stashpad.config.Win
+---@param config stashpad.win.Config
 function M.setup(config)
     M.config = config
     M.state = nil

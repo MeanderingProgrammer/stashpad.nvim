@@ -1,6 +1,6 @@
-local Git = require('stashpad.git')
+local Git = require('stashpad.lib.git')
 
----@class (exact) stashpad.config.Project
+---@class (exact) stashpad.project.Config
 ---@field order stashpad.project.Option[]
 ---@field markers string[]
 ---@field fallback fun(): string
@@ -8,11 +8,11 @@ local Git = require('stashpad.git')
 ---@alias stashpad.project.Option 'remote'|'root'|'lsp'|fun(): string?
 
 ---@class stashpad.Project
----@field private config stashpad.config.Project
+---@field private config stashpad.project.Config
 local M = {}
 
 ---Should only be called from init.lua setup
----@param config stashpad.config.Project
+---@param config stashpad.project.Config
 function M.setup(config)
     M.config = config
 end

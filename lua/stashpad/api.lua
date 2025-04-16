@@ -1,6 +1,6 @@
-local File = require('stashpad.file')
-local Git = require('stashpad.git')
-local Win = require('stashpad.win')
+local File = require('stashpad.lib.file')
+local Git = require('stashpad.lib.git')
+local Win = require('stashpad.lib.win')
 
 ---@class stashpad.Api
 local M = {}
@@ -26,6 +26,11 @@ function M.delete()
             end
         end
     end)
+end
+
+---@return string
+function M.project()
+    return File.project()
 end
 
 function M.branch()

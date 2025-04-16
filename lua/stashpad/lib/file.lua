@@ -1,6 +1,6 @@
-local Project = require('stashpad.project')
+local Project = require('stashpad.lib.project')
 
----@class (exact) stashpad.config.File
+---@class (exact) stashpad.file.Config
 ---@field root string
 ---@field extension fun(): string
 
@@ -9,17 +9,22 @@ local Project = require('stashpad.project')
 ---@field file string
 
 ---@class stashpad.File
----@field private config stashpad.config.File
+---@field private config stashpad.file.Config
 local M = {}
 
 ---Should only be called from init.lua setup
----@param config stashpad.config.File
+---@param config stashpad.file.Config
 function M.setup(config)
     M.config = config
 end
 
 function M.delete()
     vim.fs.rm(M.config.root, { recursive = true, force = true })
+end
+
+---@return string
+function M.project()
+    return vim.fs.joinpath(M.config.root, Project.get())
 end
 
 ---@param name string

@@ -3,3 +3,7 @@ settings := "{ minimal_init = " + quote(init) + ", sequential = true, keep_going
 
 test:
   nvim --headless --noplugin -u {{init}} -c "PlenaryBustedDirectory tests {{settings}}"
+
+update:
+  # Updates types.lua
+  python scripts/update.py

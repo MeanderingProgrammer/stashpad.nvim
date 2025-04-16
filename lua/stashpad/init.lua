@@ -2,10 +2,10 @@
 local M = {}
 
 ---@class (exact) stashpad.Config
----@field file stashpad.config.File
----@field git stashpad.config.Git
----@field project stashpad.config.Project
----@field win stashpad.config.Win
+---@field file stashpad.file.Config
+---@field git stashpad.git.Config
+---@field project stashpad.project.Config
+---@field win stashpad.win.Config
 
 ---@private
 M.initialized = false
@@ -41,7 +41,7 @@ M.default = {
     },
 }
 
----@param opts? stashpad.user.Config
+---@param opts? stashpad.UserConfig
 function M.setup(opts)
     -- Skip initialization if already done and input is empty
     if M.initialized and vim.tbl_count(opts or {}) == 0 then
@@ -50,10 +50,10 @@ function M.setup(opts)
     M.initialized = true
 
     local config = vim.tbl_deep_extend('force', M.default, opts or {})
-    require('stashpad.file').setup(config.file)
-    require('stashpad.git').setup(config.git)
-    require('stashpad.project').setup(config.project)
-    require('stashpad.win').setup(config.win)
+    require('stashpad.lib.file').setup(config.file)
+    require('stashpad.lib.git').setup(config.git)
+    require('stashpad.lib.project').setup(config.project)
+    require('stashpad.lib.win').setup(config.win)
 end
 
 return setmetatable(M, {

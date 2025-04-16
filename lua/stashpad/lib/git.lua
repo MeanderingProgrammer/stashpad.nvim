@@ -1,12 +1,12 @@
----@class (exact) stashpad.config.Git
+---@class (exact) stashpad.git.Config
 ---@field branch fun(): string
 
 ---@class stashpad.Git
----@field private config stashpad.config.Git
+---@field private config stashpad.git.Config
 local M = {}
 
 ---Should only be called from init.lua setup
----@param config stashpad.config.Git
+---@param config stashpad.git.Config
 function M.setup(config)
     M.config = config
 end

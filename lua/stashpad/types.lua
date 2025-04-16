@@ -1,24 +1,24 @@
 ---@meta
 
----@class (exact) stashpad.user.Config
----@field file? stashpad.config.user.File
----@field git? stashpad.config.user.Git
----@field project? stashpad.config.user.Project
----@field win? stashpad.config.user.Win
+---@class (exact) stashpad.UserConfig
+---@field file? stashpad.file.UserConfig
+---@field git? stashpad.git.UserConfig
+---@field project? stashpad.project.UserConfig
+---@field win? stashpad.win.UserConfig
 
----@class (exact) stashpad.config.user.File
+---@class (exact) stashpad.file.UserConfig
 ---@field root? string
 ---@field extension? fun(): string
 
----@class (exact) stashpad.config.user.Git
+---@class (exact) stashpad.git.UserConfig
 ---@field branch? fun(): string
 
----@class (exact) stashpad.config.user.Project
+---@class (exact) stashpad.project.UserConfig
 ---@field order? stashpad.project.Option[]
 ---@field markers? string[]
 ---@field fallback? fun(): string
 
----@class (exact) stashpad.config.user.Win
+---@class (exact) stashpad.win.UserConfig
 ---@field width? number
 ---@field height? number
 ---@field border? string|string[]
