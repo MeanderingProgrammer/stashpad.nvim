@@ -12,6 +12,7 @@ function M.setup(config)
     require('stashpad.lib.win').setup(config.win)
 end
 
+---@return string[]
 function M.validate()
     local Schema = require('stashpad.debug.schema')
     local schema = Schema.record({
@@ -21,11 +22,14 @@ function M.validate()
         win = require('stashpad.lib.win').schema(),
     })
 
+    local messages = {} ---@type string[]
     local errors = schema:check('stashpad', M.config)
     for _, err in ipairs(errors) do
-        local msg = ('expected %s, got %s'):format(err.expected, err.actual)
-        vim.print(('%s - %s'):format(err.path, msg))
+        local msg = ('expected: %s, got: %s'):format(err.expected, err.actual)
+        messages[#messages + 1] = ('%s - %s'):format(err.path, msg)
     end
+    table.sort(messages)
+    return messages
 end
 
 return M

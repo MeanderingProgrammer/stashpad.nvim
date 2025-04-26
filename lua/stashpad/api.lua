@@ -73,7 +73,10 @@ function M.todo()
 end
 
 function M.validate()
-    require('stashpad.state').validate()
+    local messages = require('stashpad.state').validate()
+    for _, message in ipairs(messages) do
+        vim.print(message)
+    end
 end
 
 return M

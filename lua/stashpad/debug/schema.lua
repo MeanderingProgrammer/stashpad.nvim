@@ -22,12 +22,7 @@ end
 
 ---@return string
 function Record:expected()
-    local fields = {} ---@type string[]
-    for key, field in pairs(self.fields) do
-        fields[#fields + 1] = ('%s: %s'):format(key, field:expected())
-    end
-    local body = table.concat(fields, ', ')
-    return ('{ %s }'):format(body)
+    return 'table'
 end
 
 ---@param path string
@@ -57,8 +52,8 @@ function Record:check(path, data)
         if self.fields[key] == nil then
             errors[#errors + 1] = {
                 path = ('%s.%s'):format(path, key),
-                expected = 'NOTHING',
-                actual = vim.inspect(value),
+                expected = 'nil',
+                actual = type(value),
             }
         end
     end
