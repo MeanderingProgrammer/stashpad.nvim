@@ -72,4 +72,8 @@ function M.todo()
     })
 end
 
+function M.validate()
+    require('stashpad.state').validate()
+end
+
 return M

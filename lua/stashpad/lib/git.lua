@@ -5,10 +5,26 @@
 ---@field private config stashpad.git.Config
 local M = {}
 
----Should only be called from init.lua setup
+---@type stashpad.git.Config
+M.default = {
+    -- Fallback for branch if it cannot be determined
+    branch = function()
+        return 'default'
+    end,
+}
+
+---called from state on setup
 ---@param config stashpad.git.Config
 function M.setup(config)
     M.config = config
+end
+
+---@return stashpad.schema.Field
+function M.schema()
+    local Schema = require('stashpad.debug.schema')
+    return Schema.record({
+        branch = Schema.type('function'),
+    })
 end
 
 ---@return string?

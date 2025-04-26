@@ -8,37 +8,15 @@ local M = {}
 ---@field win stashpad.win.Config
 
 ---@private
+---@type boolean
 M.initialized = false
 
----@private
 ---@type stashpad.Config
 M.default = {
-    file = {
-        -- Typically resolves to ~/.local/share/nvim/stashpad
-        root = vim.fs.joinpath(vim.fn.stdpath('data'), 'stashpad'),
-        -- Extension to use for files
-        extension = function()
-            return 'md'
-        end,
-    },
-    git = {
-        -- Fallback for branch if it cannot be determined
-        branch = function()
-            return 'default'
-        end,
-    },
-    project = {
-        order = { 'remote', 'root', 'lsp' },
-        markers = { '.git' },
-        fallback = function()
-            return 'default'
-        end,
-    },
-    win = {
-        width = 0.75,
-        height = 0.75,
-        border = vim.o.winborder,
-    },
+    file = require('stashpad.lib.file').default,
+    git = require('stashpad.lib.git').default,
+    project = require('stashpad.lib.project').default,
+    win = require('stashpad.lib.win').default,
 }
 
 ---@param opts? stashpad.UserConfig
@@ -48,12 +26,8 @@ function M.setup(opts)
         return
     end
     M.initialized = true
-
     local config = vim.tbl_deep_extend('force', M.default, opts or {})
-    require('stashpad.lib.file').setup(config.file)
-    require('stashpad.lib.git').setup(config.git)
-    require('stashpad.lib.project').setup(config.project)
-    require('stashpad.lib.win').setup(config.win)
+    require('stashpad.state').setup(config)
 end
 
 return setmetatable(M, {

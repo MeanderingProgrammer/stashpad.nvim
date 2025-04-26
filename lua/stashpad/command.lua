@@ -9,8 +9,8 @@ M.name = 'Stashpad'
 ---@private
 M.plugin = 'stashpad.nvim'
 
----Should only be called from plugin directory
-function M.setup()
+---called from plugin directory
+function M.init()
     vim.api.nvim_create_user_command(M.name, M.command, {
         nargs = '*',
         desc = M.plugin .. ' commands',

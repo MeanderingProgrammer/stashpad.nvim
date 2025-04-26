@@ -11,10 +11,34 @@ local Git = require('stashpad.lib.git')
 ---@field private config stashpad.project.Config
 local M = {}
 
----Should only be called from init.lua setup
+---@type stashpad.project.Config
+M.default = {
+    order = { 'remote', 'root', 'lsp' },
+    markers = { '.git' },
+    fallback = function()
+        return 'default'
+    end,
+}
+
+---called from state on setup
 ---@param config stashpad.project.Config
 function M.setup(config)
     M.config = config
+end
+
+---@return stashpad.schema.Field
+function M.schema()
+    local Schema = require('stashpad.debug.schema')
+    return Schema.record({
+        order = Schema.list(Schema.union({
+            Schema.literal('remote'),
+            Schema.literal('root'),
+            Schema.literal('lsp'),
+            Schema.type('function'),
+        })),
+        markers = Schema.list(Schema.type('string')),
+        fallback = Schema.type('function'),
+    })
 end
 
 ---@return string

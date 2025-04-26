@@ -12,10 +12,29 @@ local Project = require('stashpad.lib.project')
 ---@field private config stashpad.file.Config
 local M = {}
 
----Should only be called from init.lua setup
+---@type stashpad.file.Config
+M.default = {
+    -- Typically resolves to ~/.local/share/nvim/stashpad
+    root = vim.fs.joinpath(vim.fn.stdpath('data'), 'stashpad'),
+    -- Extension to use for files
+    extension = function()
+        return 'md'
+    end,
+}
+
+---called from state on setup
 ---@param config stashpad.file.Config
 function M.setup(config)
     M.config = config
+end
+
+---@return stashpad.schema.Field
+function M.schema()
+    local Schema = require('stashpad.debug.schema')
+    return Schema.record({
+        root = Schema.type('string'),
+        extension = Schema.type('function'),
+    })
 end
 
 function M.delete()

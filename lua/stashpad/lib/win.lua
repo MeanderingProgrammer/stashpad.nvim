@@ -17,11 +17,31 @@
 ---@field private state? stashpad.win.State
 local M = {}
 
----Should only be called from init.lua setup
+---@type stashpad.win.Config
+M.default = {
+    width = 0.75,
+    height = 0.75,
+    border = vim.o.winborder,
+}
+
+---called from state on setup
 ---@param config stashpad.win.Config
 function M.setup(config)
     M.config = config
     M.state = nil
+end
+
+---@return stashpad.schema.Field
+function M.schema()
+    local Schema = require('stashpad.debug.schema')
+    return Schema.record({
+        width = Schema.type('number'),
+        height = Schema.type('number'),
+        border = Schema.union({
+            Schema.type('string'),
+            Schema.list(Schema.type('string')),
+        }),
+    })
 end
 
 ---@param opts stashpad.win.Opts
