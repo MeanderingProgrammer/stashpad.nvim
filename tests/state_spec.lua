@@ -10,7 +10,7 @@ local function validate(config)
 end
 
 describe('state', function()
-    it('valid', function()
+    it('default', function()
         Eq({}, validate({}))
     end)
 
