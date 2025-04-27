@@ -11,14 +11,14 @@ end
 
 describe('state', function()
     it('valid', function()
-        Eq(0, #validate({}))
+        Eq({}, validate({}))
     end)
 
     it('extra', function()
         Eq(
             {
-                'stashpad.additional - expected: nil, got: boolean',
-                'stashpad.file.additional - expected: nil, got: boolean',
+                'additional - expected: nil, got: boolean',
+                'file.additional - expected: nil, got: boolean',
             },
             validate({
                 additional = true,
@@ -30,11 +30,11 @@ describe('state', function()
     it('type', function()
         Eq(
             {
-                'stashpad.file - expected: table, got: string',
-                'stashpad.git.branch - expected: function, got: string',
-                'stashpad.project.markers - expected: string[], got: string',
-                'stashpad.project.order - expected: ("remote"|"root"|"lsp"|function)[], got: string',
-                'stashpad.win.border - expected: (string|string[]), got: false',
+                'file - expected: table, got: string',
+                'git.branch - expected: function, got: string',
+                'project.markers - expected: string[], got: string',
+                'project.order - expected: ("remote"|"root"|"lsp"|function)[], got: string',
+                'win.border - expected: (string|string[]), got: false',
             },
             ---@diagnostic disable: assign-type-mismatch
             validate({
@@ -54,7 +54,7 @@ describe('state', function()
 
         Eq(
             {
-                'stashpad.project.order.1 - expected: ("remote"|"root"|"lsp"|function), got: "invalid"',
+                'project.order.1 - expected: ("remote"|"root"|"lsp"|function), got: "invalid"',
             },
             ---@diagnostic disable: assign-type-mismatch
             validate({

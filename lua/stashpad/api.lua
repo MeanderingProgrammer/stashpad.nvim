@@ -74,8 +74,12 @@ end
 
 function M.validate()
     local messages = require('stashpad.state').validate()
-    for _, message in ipairs(messages) do
-        vim.print(message)
+    if #messages == 0 then
+        vim.notify('valid configuration', vim.log.levels.INFO)
+    else
+        for _, message in ipairs(messages) do
+            vim.notify(message, vim.log.levels.ERROR)
+        end
     end
 end
 

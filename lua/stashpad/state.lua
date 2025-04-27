@@ -21,15 +21,7 @@ function M.validate()
         project = require('stashpad.lib.project').schema(),
         win = require('stashpad.lib.win').schema(),
     })
-
-    local messages = {} ---@type string[]
-    local errors = schema:check('stashpad', M.config)
-    for _, err in ipairs(errors) do
-        local msg = ('expected: %s, got: %s'):format(err.expected, err.actual)
-        messages[#messages + 1] = ('%s - %s'):format(err.path, msg)
-    end
-    table.sort(messages)
-    return messages
+    return Schema.validate(schema, M.config)
 end
 
 return M

@@ -1,11 +1,102 @@
+---@enum stashpad.schema.Kind
+local Kind = {
+    data = 'data',
+    type = 'type',
+}
+
+---@class stashpad.schema.Context
+---@field path string[]
+---@field data any
+local Context = {}
+Context.__index = Context
+
+---@param path string[]
+---@param data any
+---@return stashpad.schema.Context
+function Context.new(path, data)
+    local self = setmetatable({}, Context)
+    self.path = path
+    self.data = data
+    return self
+end
+
+---@param key any
+---@return stashpad.schema.Context
+function Context:get(key)
+    local path = vim.list_extend({}, self.path)
+    path = vim.list_extend(path, { tostring(key) })
+    assert(type(self.data) == 'table')
+    return Context.new(path, self.data[key])
+end
+
+---@param kind stashpad.schema.Kind
+---@return string
+function Context:actual(kind)
+    if kind == Kind.data then
+        return vim.inspect(self.data)
+    elseif kind == Kind.type then
+        return type(self.data)
+    else
+        error('invalid kind: ' .. kind)
+    end
+end
+
 ---@class stashpad.schema.Error
----@field path string
+---@field path string[]
 ---@field expected string
 ---@field actual string
 
+---@class stashpad.schema.Errors
+---@field private errors stashpad.schema.Error[]
+local Errors = {}
+Errors.__index = Errors
+
+---@return stashpad.schema.Errors
+function Errors.new()
+    local self = setmetatable({}, Errors)
+    self.errors = {}
+    return self
+end
+
+---@return boolean
+function Errors:empty()
+    return #self.errors == 0
+end
+
+---@param ctx stashpad.schema.Context
+---@param expected string
+---@param kind stashpad.schema.Kind
+function Errors:add(ctx, expected, kind)
+    self.errors[#self.errors + 1] = {
+        path = ctx.path,
+        expected = expected,
+        actual = ctx:actual(kind),
+    }
+end
+
+---@param other stashpad.schema.Errors
+function Errors:extend(other)
+    for _, err in ipairs(other.errors) do
+        self.errors[#self.errors + 1] = err
+    end
+end
+
+---@return string[]
+function Errors:get()
+    local messages = {} ---@type string[]
+    for _, err in ipairs(self.errors) do
+        local path = table.concat(err.path, '.')
+        local body = ('expected: %s, got: %s'):format(err.expected, err.actual)
+        local message = ('%s - %s'):format(path, body)
+        messages[#messages + 1] = message
+    end
+    table.sort(messages)
+    return messages
+end
+
 ---@class stashpad.schema.Field
----@field expected fun(self: stashpad.schema.Field): string
----@field check fun(self: stashpad.schema.Field, path: string, data: any): stashpad.schema.Error[]
+---@field type fun(self: stashpad.schema.Field): string
+---@field check fun(self: stashpad.schema.Field, ctx: stashpad.schema.Context): stashpad.schema.Errors
 
 ---@class stashpad.schema.Record: stashpad.schema.Field
 ---@field private fields table<string, stashpad.schema.Field>
@@ -13,7 +104,7 @@ local Record = {}
 Record.__index = Record
 
 ---@param fields table<string, stashpad.schema.Field>
----@return stashpad.schema.Field
+---@return stashpad.schema.Record
 function Record.new(fields)
     local self = setmetatable({}, Record)
     self.fields = fields
@@ -21,43 +112,26 @@ function Record.new(fields)
 end
 
 ---@return string
-function Record:expected()
+function Record:type()
     return 'table'
 end
 
----@param path string
----@param data any
----@return stashpad.schema.Error[]
-function Record:check(path, data)
-    local errors = {} ---@type stashpad.schema.Error[]
-
-    if type(data) ~= 'table' then
-        errors[#errors + 1] = {
-            path = path,
-            expected = self:expected(),
-            actual = type(data),
-        }
-        return errors
-    end
-
-    for key, field in pairs(self.fields) do
-        local errs = field:check(key, data[key])
-        for _, err in ipairs(errs) do
-            err.path = ('%s.%s'):format(path, err.path)
-            errors[#errors + 1] = err
+---@param ctx stashpad.schema.Context
+---@return stashpad.schema.Errors
+function Record:check(ctx)
+    local errors = Errors.new()
+    if type(ctx.data) ~= 'table' then
+        errors:add(ctx, self:type(), Kind.type)
+    else
+        for key, field in pairs(self.fields) do
+            errors:extend(field:check(ctx:get(key)))
+        end
+        for key in pairs(ctx.data) do
+            if self.fields[key] == nil then
+                errors:add(ctx:get(key), 'nil', Kind.type)
+            end
         end
     end
-
-    for key, value in pairs(data) do
-        if self.fields[key] == nil then
-            errors[#errors + 1] = {
-                path = ('%s.%s'):format(path, key),
-                expected = 'nil',
-                actual = type(value),
-            }
-        end
-    end
-
     return errors
 end
 
@@ -67,7 +141,7 @@ local List = {}
 List.__index = List
 
 ---@param field stashpad.schema.Field
----@return stashpad.schema.Field
+---@return stashpad.schema.List
 function List.new(field)
     local self = setmetatable({}, List)
     self.field = field
@@ -75,33 +149,21 @@ function List.new(field)
 end
 
 ---@return string
-function List:expected()
-    return ('%s[]'):format(self.field:expected())
+function List:type()
+    return ('%s[]'):format(self.field:type())
 end
 
----@param path string
----@param data any
----@return stashpad.schema.Error[]
-function List:check(path, data)
-    local errors = {} ---@type stashpad.schema.Error[]
-
-    if not vim.islist(data) then
-        errors[#errors + 1] = {
-            path = path,
-            expected = self:expected(),
-            actual = type(data),
-        }
-        return errors
-    end
-
-    for i, value in ipairs(data) do
-        local errs = self.field:check(tostring(i), value)
-        for _, err in ipairs(errs) do
-            err.path = ('%s.%s'):format(path, err.path)
-            errors[#errors + 1] = err
+---@param ctx stashpad.schema.Context
+---@return stashpad.schema.Errors
+function List:check(ctx)
+    local errors = Errors.new()
+    if not vim.islist(ctx.data) then
+        errors:add(ctx, self:type(), Kind.type)
+    else
+        for key in ipairs(ctx.data) do
+            errors:extend(self.field:check(ctx:get(key)))
         end
     end
-
     return errors
 end
 
@@ -111,7 +173,7 @@ local Union = {}
 Union.__index = Union
 
 ---@param fields stashpad.schema.Field[]
----@return stashpad.schema.Field
+---@return stashpad.schema.Union
 function Union.new(fields)
     local self = setmetatable({}, Union)
     self.fields = fields
@@ -119,64 +181,52 @@ function Union.new(fields)
 end
 
 ---@return string
-function Union:expected()
-    local fields = {} ---@type string[]
+function Union:type()
+    local types = {} ---@type string[]
     for _, field in ipairs(self.fields) do
-        fields[#fields + 1] = field:expected()
+        types[#types + 1] = field:type()
     end
-    local body = table.concat(fields, '|')
-    return ('(%s)'):format(body)
+    return ('(%s)'):format(table.concat(types, '|'))
 end
 
----@param path string
----@param data any
----@return stashpad.schema.Error[]
-function Union:check(path, data)
+---@param ctx stashpad.schema.Context
+---@return stashpad.schema.Errors
+function Union:check(ctx)
     local valid = false
     for _, field in ipairs(self.fields) do
-        local errors = field:check(path, data)
-        valid = valid or (#errors == 0)
+        valid = valid or field:check(ctx):empty()
     end
-    local errors = {} ---@type stashpad.schema.Error[]
+    local errors = Errors.new()
     if not valid then
-        errors[#errors + 1] = {
-            path = path,
-            expected = self:expected(),
-            actual = vim.inspect(data),
-        }
+        errors:add(ctx, self:type(), Kind.data)
     end
     return errors
 end
 
 ---@class stashpad.schema.Type: stashpad.schema.Field
----@field private type type
+---@field private value type
 local Type = {}
 Type.__index = Type
 
----@param type type
----@return stashpad.schema.Field
-function Type.new(type)
+---@param value type
+---@return stashpad.schema.Type
+function Type.new(value)
     local self = setmetatable({}, Type)
-    self.type = type
+    self.value = value
     return self
 end
 
 ---@return string
-function Type:expected()
-    return self.type
+function Type:type()
+    return self.value
 end
 
----@param path string
----@param data any
----@return stashpad.schema.Error[]
-function Type:check(path, data)
-    local errors = {} ---@type stashpad.schema.Error[]
-    if type(data) ~= self.type then
-        errors[#errors + 1] = {
-            path = path,
-            expected = self:expected(),
-            actual = type(data),
-        }
+---@param ctx stashpad.schema.Context
+---@return stashpad.schema.Errors
+function Type:check(ctx)
+    local errors = Errors.new()
+    if type(ctx.data) ~= self.value then
+        errors:add(ctx, self:type(), Kind.type)
     end
     return errors
 end
@@ -187,7 +237,7 @@ local Literal = {}
 Literal.__index = Literal
 
 ---@param value any
----@return stashpad.schema.Field
+---@return stashpad.schema.Literal
 function Literal.new(value)
     local self = setmetatable({}, Literal)
     self.value = value
@@ -195,23 +245,25 @@ function Literal.new(value)
 end
 
 ---@return string
-function Literal:expected()
+function Literal:type()
     return vim.inspect(self.value)
 end
 
----@param path string
----@param data any
----@return stashpad.schema.Error[]
-function Literal:check(path, data)
-    local errors = {} ---@type stashpad.schema.Error[]
-    if data ~= self.value then
-        errors[#errors + 1] = {
-            path = path,
-            expected = self:expected(),
-            actual = vim.inspect(data),
-        }
+---@param ctx stashpad.schema.Context
+---@return stashpad.schema.Errors
+function Literal:check(ctx)
+    local errors = Errors.new()
+    if ctx.data ~= self.value then
+        errors:add(ctx, self:type(), Kind.data)
     end
     return errors
+end
+
+---@param schema stashpad.schema.Field
+---@param data any
+---@return string[]
+local function validate(schema, data)
+    return schema:check(Context.new({}, data)):get()
 end
 
 ---@class stashpad.Schema
@@ -221,4 +273,5 @@ return {
     union = Union.new,
     type = Type.new,
     literal = Literal.new,
+    validate = validate,
 }
