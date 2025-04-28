@@ -5,7 +5,14 @@ local Git = require('stashpad.lib.git')
 ---@field markers string[]
 ---@field fallback fun(): string
 
----@alias stashpad.project.Option 'remote'|'root'|'lsp'|fun(): string?
+---@alias stashpad.project.Option stashpad.project.Provider|fun(): string?
+
+---@enum stashpad.project.Provider
+local Provider = {
+    lsp = 'lsp',
+    remote = 'remote',
+    root = 'root',
+}
 
 ---@class stashpad.Project
 ---@field private config stashpad.project.Config
@@ -31,9 +38,7 @@ function M.schema()
     local Schema = require('stashpad.debug.schema')
     return Schema.record({
         order = Schema.list(Schema.union({
-            Schema.literal('remote'),
-            Schema.literal('root'),
-            Schema.literal('lsp'),
+            Schema.enum(Provider),
             Schema.type('function'),
         })),
         markers = Schema.list(Schema.type('string')),
@@ -58,12 +63,12 @@ end
 function M.resolve(option)
     if type(option) == 'function' then
         return option()
-    elseif option == 'remote' then
-        return Git.remote()
-    elseif option == 'root' then
-        return M.root()
-    elseif option == 'lsp' then
+    elseif option == Provider.lsp then
         return M.lsp()
+    elseif option == Provider.remote then
+        return Git.remote()
+    elseif option == Provider.root then
+        return M.root()
     else
         return nil
     end
@@ -71,16 +76,16 @@ end
 
 ---@private
 ---@return string?
-function M.root()
-    local dir = vim.fs.root(assert(vim.uv.cwd()), M.config.markers)
-    return vim.fs.basename(dir)
+function M.lsp()
+    local folders = vim.lsp.buf.list_workspace_folders()
+    return vim.fs.basename(folders[1])
 end
 
 ---@private
 ---@return string?
-function M.lsp()
-    local folders = vim.lsp.buf.list_workspace_folders()
-    return vim.fs.basename(folders[1])
+function M.root()
+    local dir = vim.fs.root(assert(vim.uv.cwd()), M.config.markers)
+    return vim.fs.basename(dir)
 end
 
 return M

@@ -43,9 +43,9 @@ describe('state', function()
         local expected = {
             'file - expected: table, got: string',
             'git.branch - expected: function, got: string',
-            'project.markers - expected: string[], got: string',
-            'project.order - expected: ("remote"|"root"|"lsp"|function)[], got: string',
-            'win.border - expected: (string|string[]), got: false',
+            'project.markers - expected: (string)[], got: string',
+            'project.order - expected: ("lsp"|"remote"|"root"|function)[], got: string',
+            'win.border - expected: string|(string)[], got: false',
         }
         Eq(expected, validate(config))
     end)
@@ -57,7 +57,7 @@ describe('state', function()
             },
         }
         local expected = {
-            'project.order.1 - expected: ("remote"|"root"|"lsp"|function), got: "invalid"',
+            'project.order.1 - expected: "lsp"|"remote"|"root"|function, got: "invalid"',
         }
         Eq(expected, validate(config))
     end)

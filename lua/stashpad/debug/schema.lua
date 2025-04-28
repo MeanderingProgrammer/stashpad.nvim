@@ -150,7 +150,7 @@ end
 
 ---@return string
 function List:type()
-    return ('%s[]'):format(self.field:type())
+    return ('(%s)[]'):format(self.field:type())
 end
 
 ---@param ctx stashpad.schema.Context
@@ -182,11 +182,11 @@ end
 
 ---@return string
 function Union:type()
-    local types = {} ---@type string[]
+    local values = {} ---@type string[]
     for _, field in ipairs(self.fields) do
-        types[#types + 1] = field:type()
+        values[#values + 1] = field:type()
     end
-    return ('(%s)'):format(table.concat(types, '|'))
+    return table.concat(values, '|')
 end
 
 ---@param ctx stashpad.schema.Context
@@ -198,6 +198,39 @@ function Union:check(ctx)
     end
     local errors = Errors.new()
     if not valid then
+        errors:add(ctx, self:type(), Kind.data)
+    end
+    return errors
+end
+
+---@class stashpad.schema.Enum: stashpad.schema.Field
+---@field private values string[]
+local Enum = {}
+Enum.__index = Enum
+
+---@param values table<string, string>
+---@return stashpad.schema.Enum
+function Enum.new(values)
+    local self = setmetatable({}, Enum)
+    self.values = vim.tbl_values(values)
+    return self
+end
+
+---@return string
+function Enum:type()
+    local values = {} ---@type string[]
+    for _, value in ipairs(self.values) do
+        values[#values + 1] = vim.inspect(value)
+    end
+    table.sort(values)
+    return table.concat(values, '|')
+end
+
+---@param ctx stashpad.schema.Context
+---@return stashpad.schema.Errors
+function Enum:check(ctx)
+    local errors = Errors.new()
+    if not vim.tbl_contains(self.values, ctx.data) then
         errors:add(ctx, self:type(), Kind.data)
     end
     return errors
@@ -231,34 +264,6 @@ function Type:check(ctx)
     return errors
 end
 
----@class stashpad.schema.Literal: stashpad.schema.Field
----@field private value any
-local Literal = {}
-Literal.__index = Literal
-
----@param value any
----@return stashpad.schema.Literal
-function Literal.new(value)
-    local self = setmetatable({}, Literal)
-    self.value = value
-    return self
-end
-
----@return string
-function Literal:type()
-    return vim.inspect(self.value)
-end
-
----@param ctx stashpad.schema.Context
----@return stashpad.schema.Errors
-function Literal:check(ctx)
-    local errors = Errors.new()
-    if ctx.data ~= self.value then
-        errors:add(ctx, self:type(), Kind.data)
-    end
-    return errors
-end
-
 ---@param schema stashpad.schema.Field
 ---@param data any
 ---@return string[]
@@ -271,7 +276,7 @@ return {
     record = Record.new,
     list = List.new,
     union = Union.new,
+    enum = Enum.new,
     type = Type.new,
-    literal = Literal.new,
     validate = validate,
 }
