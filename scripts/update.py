@@ -64,7 +64,7 @@ def update_types(root: Path) -> None:
 def update_readme(root: Path) -> None:
     readme = Path("README.md")
 
-    old = get_code_block(readme, 0)
+    old = get_code_block(readme, 2)
 
     new = get_default(root.joinpath("init.lua"))
     new = f"require('stashpad').setup({new})\n"

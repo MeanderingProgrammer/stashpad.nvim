@@ -2,7 +2,44 @@
 
 Plugin for storing scratch notes based on git info
 
-# Default Configuration
+# Install
+
+## lazy.nvim
+
+```lua
+{
+    'MeanderingProgrammer/stashpad.nvim',
+    ---@module 'stashpad'
+    ---@type stashpad.UserConfig
+    opts = {},
+}
+```
+
+## packer.nvim
+
+```lua
+use({
+    'MeanderingProgrammer/stashpad.nvim',
+    config = function()
+        require('stashpad').setup({})
+    end,
+})
+```
+
+# Commands
+
+| Command              | Lua Function                     | Description                                   |
+| -------------------- | -------------------------------- | --------------------------------------------- |
+| `:Stashpad branch`   | `require('stashpad').branch()`   | for current project toggle git branch notes   |
+| `:Stashpad global`   | `require('stashpad').global()`   | for current project toggle global notes       |
+| `:Stashpad todo`     | `require('stashpad').todo()`     | for current project toggle todo notes         |
+| `:Stashpad project`  | `require('stashpad').project()`  | returns value of current project              |
+| `:Stashpad validate` | `require('stashpad').validate()` | validates configuration and prints any errors |
+| `:Stashpad delete`   | `require('stashpad').delete()`   | delete all notes across all projects          |
+
+# Setup
+
+## Default Configuration
 
 ```lua
 require('stashpad').setup({
