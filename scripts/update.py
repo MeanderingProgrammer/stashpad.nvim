@@ -42,15 +42,14 @@ class LuaClass:
 
 
 def main() -> None:
-    root = Path("lua/stashpad")
+    root = next(Path("lua").glob("*"))
     update_types(root)
     update_readme(root)
 
 
 def update_types(root: Path) -> None:
-    libs = list(root.joinpath("lib").iterdir())
-    libs.sort(key=str)
-    files: list[Path] = [root.joinpath("init.lua")] + libs
+    files: list[Path] = [root.joinpath("init.lua")]
+    files.extend(sorted(root.joinpath("lib").iterdir()))
 
     classes: list[str] = ["---@meta"]
     for definition in get_definitions(files):
@@ -67,7 +66,7 @@ def update_readme(root: Path) -> None:
     old = get_code_block(readme, 2)
 
     new = get_default(root.joinpath("init.lua"))
-    new = f"require('stashpad').setup({new})\n"
+    new = f"require('{root.name}').setup({new})\n"
     while True:
         match = re.search(r"require\('(.*?)'\)\.default", new)
         if match is None:
