@@ -1,4 +1,4 @@
-*stashpad.txt*            For NVIM v0.11.2           Last change: 2025 July 09
+*stashpad.txt*            For NVIM v0.11.3           Last change: 2025 July 25
 
 ==============================================================================
 Table of Contents                                 *stashpad-table-of-contents*
@@ -49,26 +49,29 @@ PACKER.NVIM                                     *stashpad-install-packer.nvim*
 ==============================================================================
 3. Commands                                                *stashpad-commands*
 
-  --------------------------------------------------------------------------------------
-  Command              Lua Function                     Description
-  -------------------- -------------------------------- --------------------------------
-  :Stashpad branch     require('stashpad').branch()     for current project toggle git
-                                                        branch notes
+  ------------------------------------------------------------------------------------------------
+  Command              Lua Function                                   Description
+  -------------------- ---------------------------------------------- ----------------------------
+  :Stashpad branch     require('stashpad').branch()                   current project git branch
+                                                                      notes
 
-  :Stashpad global     require('stashpad').global()     for current project toggle
-                                                        global notes
+  :Stashpad file       require('stashpad').file()                     current project file notes
 
-  :Stashpad todo       require('stashpad').todo()       for current project toggle todo
-                                                        notes
+  :Stashpad global     require('stashpad').global(project?: string)   project (or current) global
+                                                                      notes
 
-  :Stashpad project    require('stashpad').project()    returns value of current project
+  :Stashpad todo       require('stashpad').todo(project?: string)     project (or current) todo
+                                                                      notes
 
-  :Stashpad validate   require('stashpad').validate()   validates configuration and
-                                                        prints any errors
+  :Stashpad project    require('stashpad').project()                  returns value of current
+                                                                      project
 
-  :Stashpad delete     require('stashpad').delete()     delete all notes across all
-                                                        projects
-  --------------------------------------------------------------------------------------
+  :Stashpad validate   require('stashpad').validate()                 validates configuration and
+                                                                      prints any errors
+
+  :Stashpad delete     require('stashpad').delete()                   delete all notes across all
+                                                                      projects
+  ------------------------------------------------------------------------------------------------
 
 ==============================================================================
 4. Setup                                                      *stashpad-setup*

@@ -30,16 +30,18 @@ function M.file()
     })
 end
 
-function M.global()
+---@param project? string
+function M.global(project)
     Win.toggle({
-        info = File.get('global'),
+        info = File.get('global', project),
         title = 'Global',
     })
 end
 
-function M.todo()
+---@param project? string
+function M.todo(project)
     Win.toggle({
-        info = File.get('todo'),
+        info = File.get('todo', project),
         title = 'Todo',
     })
 end

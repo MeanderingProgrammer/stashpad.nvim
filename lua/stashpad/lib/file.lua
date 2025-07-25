@@ -47,9 +47,10 @@ function M.project()
 end
 
 ---@param name string
+---@param project? string
 ---@return stashpad.file.Info
-function M.get(name)
-    local project = Project.get()
+function M.get(name, project)
+    project = project or Project.get()
     local path = vim.fs.joinpath(M.config.root, project, name)
     local file = string.format('%s.%s', path, M.config.extension())
 

@@ -28,14 +28,15 @@ use({
 
 # Commands
 
-| Command              | Lua Function                     | Description                                   |
-| -------------------- | -------------------------------- | --------------------------------------------- |
-| `:Stashpad branch`   | `require('stashpad').branch()`   | for current project toggle git branch notes   |
-| `:Stashpad global`   | `require('stashpad').global()`   | for current project toggle global notes       |
-| `:Stashpad todo`     | `require('stashpad').todo()`     | for current project toggle todo notes         |
-| `:Stashpad project`  | `require('stashpad').project()`  | returns value of current project              |
-| `:Stashpad validate` | `require('stashpad').validate()` | validates configuration and prints any errors |
-| `:Stashpad delete`   | `require('stashpad').delete()`   | delete all notes across all projects          |
+| Command              | Lua Function                                   | Description                                   |
+| -------------------- | ---------------------------------------------- | --------------------------------------------- |
+| `:Stashpad branch`   | `require('stashpad').branch()`                 | current project git branch notes              |
+| `:Stashpad file`     | `require('stashpad').file()`                   | current project file notes                    |
+| `:Stashpad global`   | `require('stashpad').global(project?: string)` | project (or current) global notes             |
+| `:Stashpad todo`     | `require('stashpad').todo(project?: string)`   | project (or current) todo notes               |
+| `:Stashpad project`  | `require('stashpad').project()`                | returns value of current project              |
+| `:Stashpad validate` | `require('stashpad').validate()`               | validates configuration and prints any errors |
+| `:Stashpad delete`   | `require('stashpad').delete()`                 | delete all notes across all projects          |
 
 # Setup
 
