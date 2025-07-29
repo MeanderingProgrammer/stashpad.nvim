@@ -119,14 +119,16 @@ end
 ---@param ctx stashpad.schema.Context
 ---@return stashpad.schema.Errors
 function Record:check(ctx)
+    local data = ctx.data
     local errors = Errors.new()
-    if type(ctx.data) ~= 'table' then
+    if type(data) ~= 'table' then
         errors:add(ctx, self:type(), Kind.type)
     else
+        ---@cast data table<any, any>
         for key, field in pairs(self.fields) do
             errors:extend(field:check(ctx:get(key)))
         end
-        for key in pairs(ctx.data) do
+        for key in pairs(data) do
             if self.fields[key] == nil then
                 errors:add(ctx:get(key), 'nil', Kind.type)
             end
