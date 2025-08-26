@@ -28,13 +28,15 @@ function M.setup(config)
     M.config = config
 end
 
----@return stashpad.schema.Field
+---@return stashpad.Schema
 function M.schema()
-    local Schema = require('stashpad.debug.schema')
-    return Schema.record({
-        root = Schema.type('string'),
-        extension = Schema.type('function'),
-    })
+    ---@type stashpad.Schema
+    return {
+        record = {
+            root = { type = 'string' },
+            extension = { type = 'function' },
+        },
+    }
 end
 
 function M.delete()

@@ -31,17 +31,18 @@ function M.setup(config)
     M.state = nil
 end
 
----@return stashpad.schema.Field
+---@return stashpad.Schema
 function M.schema()
-    local Schema = require('stashpad.debug.schema')
-    return Schema.record({
-        width = Schema.type('number'),
-        height = Schema.type('number'),
-        border = Schema.union({
-            Schema.type('string'),
-            Schema.list(Schema.type('string')),
-        }),
-    })
+    ---@type stashpad.Schema
+    return {
+        record = {
+            width = { type = 'number' },
+            height = { type = 'number' },
+            border = {
+                union = { { type = 'string' }, { list = { type = 'string' } } },
+            },
+        },
+    }
 end
 
 ---@param opts stashpad.win.Opts

@@ -33,17 +33,20 @@ function M.setup(config)
     M.config = config
 end
 
----@return stashpad.schema.Field
+---@return stashpad.Schema
 function M.schema()
-    local Schema = require('stashpad.debug.schema')
-    return Schema.record({
-        order = Schema.list(Schema.union({
-            Schema.enum(Provider),
-            Schema.type('function'),
-        })),
-        markers = Schema.list(Schema.type('string')),
-        fallback = Schema.type('function'),
-    })
+    ---@type stashpad.Schema
+    return {
+        record = {
+            order = {
+                list = {
+                    union = { { enum = Provider }, { type = 'function' } },
+                },
+            },
+            markers = { list = { type = 'string' } },
+            fallback = { type = 'function' },
+        },
+    }
 end
 
 ---@return string

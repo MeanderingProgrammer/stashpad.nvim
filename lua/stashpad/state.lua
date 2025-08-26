@@ -14,14 +14,14 @@ end
 
 ---@return string[]
 function M.validate()
-    local Schema = require('stashpad.debug.schema')
-    local schema = Schema.record({
-        file = require('stashpad.lib.file').schema(),
-        git = require('stashpad.lib.git').schema(),
-        project = require('stashpad.lib.project').schema(),
-        win = require('stashpad.lib.win').schema(),
+    return require('stashpad.debug.schema').validate(M.config, {
+        record = {
+            file = require('stashpad.lib.file').schema(),
+            git = require('stashpad.lib.git').schema(),
+            project = require('stashpad.lib.project').schema(),
+            win = require('stashpad.lib.win').schema(),
+        },
     })
-    return Schema.validate(schema, M.config)
 end
 
 return M
