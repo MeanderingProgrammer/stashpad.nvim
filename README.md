@@ -62,7 +62,7 @@ require('stashpad').setup({
         order = { 'remote', 'root', 'lsp' },
         markers = { '.git' },
         fallback = function()
-            return 'default'
+            return vim.fs.basename(assert(vim.uv.cwd()))
         end,
     },
     win = {
