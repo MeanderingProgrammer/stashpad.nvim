@@ -1,8 +1,7 @@
-local initialized = false
-if initialized then
+if vim.g.loaded_stashpad then
     return
 end
-initialized = true
+vim.g.loaded_stashpad = true
 
 require('stashpad').setup()
 require('stashpad.command').init()

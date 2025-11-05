@@ -1,4 +1,4 @@
-local Git = require('stashpad.lib.git')
+local git = require('stashpad.lib.git')
 
 ---@class (exact) stashpad.project.Config
 ---@field order stashpad.project.Option[]
@@ -36,13 +36,13 @@ end
 ---@return stashpad.Schema
 function M.schema()
     ---@type stashpad.Schema
+    local option = {
+        union = { { enum = Provider }, { type = 'function' } },
+    }
+    ---@type stashpad.Schema
     return {
         record = {
-            order = {
-                list = {
-                    union = { { enum = Provider }, { type = 'function' } },
-                },
-            },
+            order = { list = option },
             markers = { list = { type = 'string' } },
             fallback = { type = 'function' },
         },
@@ -69,7 +69,7 @@ function M.resolve(option)
     elseif option == Provider.lsp then
         return M.lsp()
     elseif option == Provider.remote then
-        return Git.remote()
+        return git.remote()
     elseif option == Provider.root then
         return M.root()
     else

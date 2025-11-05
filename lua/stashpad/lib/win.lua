@@ -79,7 +79,7 @@ function M.open(opts)
         height = height,
         relative = 'editor',
         border = M.config.border,
-        title = string.format(' Project : %s | %s ', info.project, opts.title),
+        title = (' Project : %s | %s '):format(info.project, opts.title),
         title_pos = 'center',
     })
     vim.api.nvim_set_option_value('winfixbuf', true, { win = win })

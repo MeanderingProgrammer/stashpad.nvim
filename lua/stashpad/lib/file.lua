@@ -1,5 +1,3 @@
-local Project = require('stashpad.lib.project')
-
 ---@class (exact) stashpad.file.Config
 ---@field root string
 ---@field extension fun(): string
@@ -45,16 +43,16 @@ end
 
 ---@return string
 function M.project()
-    return vim.fs.joinpath(M.config.root, Project.get())
+    return vim.fs.joinpath(M.config.root, M.resolve())
 end
 
 ---@param name string
 ---@param project? string
 ---@return stashpad.file.Info
 function M.get(name, project)
-    project = project or Project.get()
+    project = project or M.resolve()
     local path = vim.fs.joinpath(M.config.root, project, name)
-    local file = string.format('%s.%s', path, M.config.extension())
+    local file = ('%s.%s'):format(path, M.config.extension())
 
     local dir = vim.fs.dirname(file)
     if vim.uv.fs_stat(dir) == nil then
@@ -66,6 +64,12 @@ function M.get(name, project)
 
     ---@type stashpad.file.Info
     return { project = project, file = file }
+end
+
+---@private
+---@return string
+function M.resolve()
+    return require('stashpad.lib.project').get()
 end
 
 return M

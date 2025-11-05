@@ -1,15 +1,15 @@
-local File = require('stashpad.lib.file')
-local Git = require('stashpad.lib.git')
-local Win = require('stashpad.lib.win')
+local file = require('stashpad.lib.file')
+local git = require('stashpad.lib.git')
+local win = require('stashpad.lib.win')
 
 ---@class stashpad.Api
 local M = {}
 
 function M.branch()
-    local branch = Git.branch()
-    Win.toggle({
-        info = File.get(vim.fs.joinpath('branch', branch)),
-        title = string.format('Branch : %s', branch),
+    local branch = git.branch()
+    win.toggle({
+        info = file.get(vim.fs.joinpath('branch', branch)),
+        title = ('Branch : %s'):format(branch),
     })
 end
 
@@ -23,32 +23,32 @@ function M.file()
     if path == nil then
         return
     end
-    local file = vim.fn.fnamemodify(path, ':r')
-    Win.toggle({
-        info = File.get(vim.fs.joinpath('file', file)),
-        title = string.format('File : %s', vim.fs.basename(path)),
+    local root = vim.fn.fnamemodify(path, ':r')
+    win.toggle({
+        info = file.get(vim.fs.joinpath('file', root)),
+        title = ('File : %s'):format(vim.fs.basename(path)),
     })
 end
 
 ---@param project? string
 function M.global(project)
-    Win.toggle({
-        info = File.get('global', project),
+    win.toggle({
+        info = file.get('global', project),
         title = 'Global',
     })
 end
 
 ---@param project? string
 function M.todo(project)
-    Win.toggle({
-        info = File.get('todo', project),
+    win.toggle({
+        info = file.get('todo', project),
         title = 'Todo',
     })
 end
 
 ---@return string
 function M.project()
-    return File.project()
+    return file.project()
 end
 
 function M.validate()
@@ -75,11 +75,11 @@ function M.delete()
         if input ~= ack then
             vim.notify('skip', levels.INFO)
         else
-            local ok, err = pcall(File.delete)
+            local ok, err = pcall(file.delete)
             if ok then
                 vim.notify('success', levels.INFO)
             else
-                vim.notify(string.format('fail: %s', err), levels.ERROR)
+                vim.notify(('fail: %s'):format(err), levels.ERROR)
             end
         end
     end)
