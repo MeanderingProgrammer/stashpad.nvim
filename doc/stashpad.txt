@@ -5,6 +5,7 @@ Table of Contents                                 *stashpad-table-of-contents*
 
 1. stashpad.nvim                                      |stashpad-stashpad.nvim|
 2. Install                                                  |stashpad-install|
+  - vim.pack                                       |stashpad-install-vim.pack|
   - lazy.nvim                                     |stashpad-install-lazy.nvim|
   - packer.nvim                                 |stashpad-install-packer.nvim|
 3. Commands                                                |stashpad-commands|
@@ -20,6 +21,16 @@ Plugin for storing scratch notes based on git info
 
 ==============================================================================
 2. Install                                                  *stashpad-install*
+
+
+VIM.PACK                                           *stashpad-install-vim.pack*
+
+>lua
+    vim.pack.add({
+        'https://github.com/MeanderingProgrammer/stashpad.nvim',
+    })
+    require('stashpad').setup({})
+<
 
 
 LAZY.NVIM                                         *stashpad-install-lazy.nvim*

@@ -4,6 +4,15 @@ Plugin for storing scratch notes based on git info
 
 # Install
 
+## vim.pack
+
+```lua
+vim.pack.add({
+    'https://github.com/MeanderingProgrammer/stashpad.nvim',
+})
+require('stashpad').setup({})
+```
+
 ## lazy.nvim
 
 ```lua
