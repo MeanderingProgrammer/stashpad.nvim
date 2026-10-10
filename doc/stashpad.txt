@@ -1,4 +1,5 @@
-*stashpad.txt*           For NVIM v0.12.0           Last change: 2026 April 04
+*stashpad.txt*
+                              For NVIM v0.12.5    Last change: 2026 October 10
 
 ==============================================================================
 Table of Contents                                 *stashpad-table-of-contents*
